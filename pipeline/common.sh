@@ -31,6 +31,10 @@ METADATA_DIR=$(pwd_relative_path "$BASE_DIR/metadata")
 SCRIPT_DIR=$(pwd_relative_path "$BASE_DIR/scripts")
 DATA_DIR=$(pwd_relative_path "$BASE_DIR/data")
 
+if [ ! -e "$METADATA_DIR/$LC.json" ]; then
+    error_exit "Unknown language $LC (missing $METADATA_DIR/$LC.json)"
+fi
+
 get_config_value () {
     python3 "$SCRIPT_DIR/getvalue.py" "$METADATA_DIR/$1.json" "$2"
 }
@@ -78,12 +82,17 @@ TOKENIZED_SAMPLE_PATH="$TOKENIZED_SAMPLE_DIR/tokenized-sample-cased.txt"
 
 SENTENCEPIECE_MODEL_DIR="$DATA_DIR/$LC/sentencepiece"
 SENTENCEPIECE_MODEL_PATH="$SENTENCEPIECE_MODEL_DIR/model"
+SENTENCEPIECE_VOCAB_PATH="$SENTENCEPIECE_MODEL_PATH.vocab"
 SENTENCEPIECE="$SCRIPT_DIR/spmtrain.py"
 SENTENCEPIECE_PARAMS="
---model_prefix=$SENTENCEPIECE_MODEL_PATH
 --vocab_size=20000
 --input_sentence_size=100000000
+--shuffle_input_sentence=true
 --character_coverage=0.9999
 --model_type=bpe
---input=$SAMPLED_TEXT_PATH
 "
+
+WORDPIECE_VOCAB_DIR="$DATA_DIR/$LC/wordpiece"
+WORDPIECE_VOCAB_PATH="$WORDPIECE_VOCAB_DIR/vocab.txt"
+SENT2WORDPIECE=$(pwd_relative_path "$BASE_DIR/sent2wordpiece/sent2wordpiece.py")
+SENT2WORDPIECE_PARAMS=""
