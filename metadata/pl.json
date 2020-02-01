@@ -1,0 +1,5 @@
+{
+    "word-chars": "aąbcćdeęfghijklłmnńoóprsśtuwyzźż",
+    "wiki-dump": "https://ftp.acc.umu.se/mirror/wikimedia.org/dumps/plwiki/20200120/plwiki-20200120-pages-articles.xml.bz2",
+    "udpipe-model": "https://lindat.mff.cuni.cz/repository/xmlui/bitstream/handle/11234/1-2998/polish-pdb-ud-2.4-190531.udpipe"
+}
