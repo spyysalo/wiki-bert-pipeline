@@ -1,3 +1,6 @@
 [submodule "wikiextractor"]
 	path = wikiextractor
 	url = https://github.com/attardi/wikiextractor.git
+[submodule "sent2wordpiece"]
+	path = sent2wordpiece
+	url = https://github.com/spyysalo/sent2wordpiece.git
