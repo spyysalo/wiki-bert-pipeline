@@ -12,24 +12,24 @@ if [ -s "$SAMPLED_TEXT_PATH" ]; then
     exit 0
 fi
 
-count=$(find "$TOKENIZED_TEXT_DIR" -type f | wc -l | perl -pe 's/\s//g')
+count=$(find "$DOC_FILTERED_DIR" -type f | wc -l | perl -pe 's/\s//g')
 
 if [ $count -eq 0 ]; then
-    error_exit "no files in $TOKENIZED_TEXT_DIR"
+    error_exit "no files in $DOC_FILTERED_DIR"
 else
-    echo "$SCRIPT: processing $count files in $TOKENIZED_TEXT_DIR"
+    echo "$SCRIPT: processing $count files in $DOC_FILTERED_DIR"
 fi
 
 # Grab total number of sentences, determine sampling probability to
 # get approximately targeted number of sentences.
-total=$(find "$TOKENIZED_TEXT_DIR" -type f | sort | xargs cat \
+total=$(find "$DOC_FILTERED_DIR" -type f | sort | xargs cat \
 	    | egrep -v '^[[:space:]]*$' | wc -l | perl -pe 's/\s//g')
 
 ratio=$(python3 -c "print(min(1.0, $SAMPLED_SENTENCE_NUM/$total))")
 
 echo "$SCRIPT: sampling $ratio of sentences (total $total, target $SAMPLED_SENTENCE_NUM)" >&2
 
-find "$TOKENIZED_TEXT_DIR" -type f | sort | xargs cat \
+find "$DOC_FILTERED_DIR" -type f | sort | xargs cat \
     | egrep -v '^[[:space:]]*$' \
     | perl -pe '$_ = "" unless(rand()<'"$ratio"')' \
 	   > "$SAMPLED_TEXT_PATH"
