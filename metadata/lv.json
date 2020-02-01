@@ -1,0 +1,5 @@
+{
+    "word-chars":"aābcčdeēfgģhiījkķlļmnņoprsštuūvzž",
+    "wiki-dump": "https://ftp.acc.umu.se/mirror/wikimedia.org/dumps/lvwiki/20200120/lvwiki-20200120-pages-articles.xml.bz2",
+    "udpipe-model": "https://lindat.mff.cuni.cz/repository/xmlui/bitstream/handle/11234/1-2998/latvian-lvtb-ud-2.4-190531.udpipe"
+}
