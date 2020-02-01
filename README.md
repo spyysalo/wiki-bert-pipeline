@@ -4,6 +4,14 @@ Tools for creating BERT vocabularies based on Wikipedia texts
 
 ## Quickstart
 
+Setup
+
+```
+git submodule init
+git submodule update
+pip3 install -r requirements.txt
+```
+
 To run the full process for a language with the two-character language
 code LC, run
 

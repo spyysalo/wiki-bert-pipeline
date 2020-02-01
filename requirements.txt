@@ -1,0 +1,4 @@
+ufal.udpipe
+langdetect
+bert-tensorflow
+sentencepiece
