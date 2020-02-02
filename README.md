@@ -1,12 +1,12 @@
 # Wikipedia BERT pipeline
 
-Pipeline for creating BERT vocabularies and pretraining examples based on Wikipedia texts
+Pipeline for creating BERT vocabularies and pretraining examples based on Wikipedia texts.
 
 ## Completed vocabularies
 
 A number of language-specific BERT vocabularies created from Wikipedia texts using this pipeline are included in the [vocabs](https://github.com/spyysalo/bert-wiki-vocabs/tree/master/vocabs) subdirectory.
 
-To recreate one of these vocabularies or create a vocabulary for a language not included in the collection, follow the instructions below.
+To recreate one of these vocabularies, create pretraining examples, or create a vocabulary and examples for a language not included in the collection, follow the instructions below.
 
 ## Quickstart
 
@@ -30,10 +30,15 @@ code LC, run
 ## Adding new languages
 
 To add support for a new language with the two-character language code
-LC, create `metadata/LC.json` and fill in the relevant values for
+LC, create `languages/LC.json` and fill in the relevant values for
 `word-chars` (sequence of word characters), `wiki-dump` (URL) and
-`udpipe-model` (URL). See the existing JSON files in `metadata/`
+`udpipe-model` (URL). See the existing JSON files in `languages/`
 for examples.
+
+## Configuration
+
+To modify the parameters sent to the key components of the pipeline,
+edit the appropriate file in the `config/` directory.
 
 ## Limitations
 
