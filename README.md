@@ -1,6 +1,6 @@
-# BERT Wiki vocabularies
+# Wikipedia BERT pipeline
 
-Tools for creating BERT vocabularies based on Wikipedia texts
+Pipeline for creating BERT vocabularies and pretraining examples based on Wikipedia texts
 
 ## Completed vocabularies
 
@@ -38,7 +38,7 @@ for examples.
 ## Limitations
 
 The source texts are extracted from Wikipedia, and the quality of the
-generated vocabulary depends on the quantity (and quality) of Wikipedia
+generated data depends on the quantity (and quality) of Wikipedia
 text available for the language.
 
 The document filtering heuristics were developed for Indo-European
