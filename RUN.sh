@@ -17,15 +17,19 @@ BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 SCRIPTDIR="$BASEDIR/pipeline"
 
+br=$(basename "$0")
+echo $'\n'"---------- $br $LC: START ----------" >&2
+echo "           $(date)"$'\n' >&2
+
 for script in $(find "$SCRIPTDIR" -maxdepth 1 -name '[0-9]*.sh' | sort); do
     br=$(basename "$0")
     bs=$(basename "$script")
-    echo
-    echo "---------- $br: RUNNING $bs ----------" >&2
-    echo
+    echo $'\n'"---------- $br: RUNNING $bs ----------" >&2
+    echo "           $(date)"$'\n' >&2
     "$script" "$LC"
+    echo $'\n'"---------- $br: COMPLETED $bs ----------" >&2
+    echo "           $(date)"$'\n' >&2
 done
 
-echo
-echo "---------- $br: DONE ----------" >&2
-echo
+echo $'\n'"---------- $br: DONE ----------" >&2
+echo "           $(date)"$'\n' >&2
