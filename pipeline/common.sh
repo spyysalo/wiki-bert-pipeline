@@ -27,26 +27,27 @@ pwd_relative_path () {
 
 SCRIPT=$(pwd_relative_path "$0")
 BASE_DIR=$(pwd_relative_path "$PIPELINE_DIR/..")
-METADATA_DIR=$(pwd_relative_path "$BASE_DIR/metadata")
+LANGUAGE_DATA_DIR=$(pwd_relative_path "$BASE_DIR/languages")
 SCRIPT_DIR=$(pwd_relative_path "$BASE_DIR/scripts")
 DATA_DIR=$(pwd_relative_path "$BASE_DIR/data")
+CONFIG_DIR=$(pwd_relative_path "$BASE_DIR/config")
 
-if [ ! -e "$METADATA_DIR/$LC.json" ]; then
-    error_exit "Unknown language $LC (missing $METADATA_DIR/$LC.json)"
+if [ ! -e "$LANGUAGE_DATA_DIR/$LC.json" ]; then
+    error_exit "Unknown language $LC (missing $LANGUAGE_DATA_DIR/$LC.json)"
 fi
 
-get_config_value () {
-    python3 "$SCRIPT_DIR/getvalue.py" "$METADATA_DIR/$1.json" "$2"
+get_language_attribute () {
+    python3 "$SCRIPT_DIR/getvalue.py" "$LANGUAGE_DATA_DIR/$1.json" "$2"
 }
 
-WIKI_DUMP_URL=$(get_config_value "$LC" "wiki-dump")
+WIKI_DUMP_URL=$(get_language_attribute "$LC" "wiki-dump")
 WIKI_DUMP_DIR="$DATA_DIR/$LC/wikipedia-dump"
 WIKI_DUMP_PATH="$WIKI_DUMP_DIR/$(basename $WIKI_DUMP_URL)"
 
 WIKIEXTRACTOR="$BASE_DIR/wikiextractor/WikiExtractor.py"
 WIKI_TEXT_DIR="$DATA_DIR/$LC/wikipedia-texts"
 
-UDPIPE_MODEL_URL=$(get_config_value "$LC" "udpipe-model")
+UDPIPE_MODEL_URL=$(get_language_attribute "$LC" "udpipe-model")
 UDPIPE_MODEL_DIR="$DATA_DIR/$LC/udpipe-model"
 UDPIPE_MODEL_PATH="$UDPIPE_MODEL_DIR/$(basename $UDPIPE_MODEL_URL)"
 
@@ -54,23 +55,9 @@ TOKENIZER="$SCRIPT_DIR/udtokenize.py"
 TOKENIZED_TEXT_DIR="$DATA_DIR/$LC/tokenized-texts"
 
 DOC_FILTER="$SCRIPT_DIR/filterdocs.py"
-DOC_FILTER_WORD_CHARS=$(get_config_value "$LC" "word-chars")
+DOC_FILTER_WORD_CHARS=$(get_language_attribute "$LC" "word-chars")
 DOC_FILTERED_DIR="$DATA_DIR/$LC/filtered-texts"
-DOC_FILTER_PARAMS="
---min-sents 3
---max-sents 1000
---avg-len 5
---upper-ratio 0.1
---no-word-ratio 0.2
---punct-ratio 0.05
---digit-ratio 0.05
---min-toks 20
---max-toks 10000
---min-words 30
---foreign-ratio 0.01
---word-chars $DOC_FILTER_WORD_CHARS
---langdetect $LC
-"
+source "$CONFIG_DIR/filter.sh"
 
 SAMPLED_TEXT_DIR="$DATA_DIR/$LC/sampled-texts"
 SAMPLED_TEXT_PATH="$SAMPLED_TEXT_DIR/sampled-sentences.txt"
@@ -84,13 +71,7 @@ SENTENCEPIECE_MODEL_DIR="$DATA_DIR/$LC/sentencepiece"
 SENTENCEPIECE_MODEL_PATH="$SENTENCEPIECE_MODEL_DIR/cased"
 SENTENCEPIECE_VOCAB_PATH="$SENTENCEPIECE_MODEL_PATH.vocab"
 SENTENCEPIECE="$SCRIPT_DIR/spmtrain.py"
-SENTENCEPIECE_PARAMS="
---vocab_size=20000
---input_sentence_size=100000000
---shuffle_input_sentence=true
---character_coverage=0.9999
---model_type=bpe
-"
+source "$CONFIG_DIR/sentencepiece.sh"
 
 WORDPIECE_VOCAB_DIR="$DATA_DIR/$LC/wordpiece/cased"
 WORDPIECE_VOCAB_PATH="$WORDPIECE_VOCAB_DIR/vocab.txt"
@@ -100,17 +81,4 @@ SENT2WORDPIECE_PARAMS=""
 TFRECORD_DIR_128="$DATA_DIR/$LC/tfrecords/seq-128"
 TFRECORD_DIR_512="$DATA_DIR/$LC/tfrecords/seq-512"
 CREATE_TFRECORD="$HOME/git_checkout/bert/create_pretraining_data.py"
-CREATE_TFRECORD_PARAMS="
---vocab_file=$WORDPIECE_VOCAB_PATH
---do_lower_case=false
---do_whole_word_mask=true
---dupe_factor=10
-"
-CREATE_TFRECORD_PARAMS_128="
---max_seq_length=128
---max_predictions_per_seq=20
-"
-CREATE_TFRECORD_PARAMS_512="
---max_seq_length=512
---max_predictions_per_seq=77
-"
+source "$CONFIG_DIR/tfrecord.sh"
