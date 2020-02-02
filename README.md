@@ -2,6 +2,12 @@
 
 Tools for creating BERT vocabularies based on Wikipedia texts
 
+## Completed vocabularies
+
+A number of language-specific BERT vocabularies created from Wikipedia texts using this pipeline are included in the [vocabs](https://github.com/spyysalo/bert-wiki-vocabs/tree/master/vocabs) subdirectory.
+
+To recreate one of these vocabularies or create a vocabulary for a language not included in the collection, follow the instructions below.
+
 ## Quickstart
 
 Setup
