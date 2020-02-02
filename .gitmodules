@@ -4,3 +4,6 @@
 [submodule "sent2wordpiece"]
 	path = sent2wordpiece
 	url = https://github.com/spyysalo/sent2wordpiece.git
+[submodule "bert"]
+	path = bert
+	url = https://github.com/google-research/bert.git
