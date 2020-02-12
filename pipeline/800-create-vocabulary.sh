@@ -11,8 +11,8 @@ fi
 
 mkdir -p "$SENTENCEPIECE_MODEL_DIR"
 
-if [ -s "$SENTENCEPIECE_MODEL_PATH" ]; then
-    echo "$SCRIPT: $SENTENCEPIECE_MODEL_PATH exists, not recreating." >&2
+if [ -s "$SENTENCEPIECE_MODEL_PATH.vocab" ]; then
+    echo "$SCRIPT: $SENTENCEPIECE_MODEL_PATH.vocab exists, not recreating." >&2
     exit 0
 else
     params="
