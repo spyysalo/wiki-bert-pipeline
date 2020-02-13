@@ -80,5 +80,5 @@ SENT2WORDPIECE_PARAMS=""
 
 TFRECORD_DIR_128="$DATA_DIR/$LC/tfrecords/seq-128"
 TFRECORD_DIR_512="$DATA_DIR/$LC/tfrecords/seq-512"
-CREATE_TFRECORD="$HOME/git_checkout/bert/create_pretraining_data.py"
+CREATE_TFRECORD="$BASE_DIR/bert/create_pretraining_data.py"
 source "$CONFIG_DIR/tfrecord.sh"
