@@ -28,6 +28,8 @@ def argparser():
     ap.add_argument('-d', '--document-tags', default=False, action='store_true',
                     help='Include document start/end tags in output')
     ap.add_argument('-e', '--encoding', default='utf-8')
+    ap.add_argument('-n', '--no-split', default=False, action='store_true',
+                    help='Do not split sentences on separate lines')
     ap.add_argument('-s', '--save-stats', metavar='FILE', default=None)
     ap.add_argument('-q', '--quiet', default=False, action='store_true')
     ap.add_argument('model', help='UDPipe model')
@@ -72,7 +74,10 @@ def tokenize_stream(pipeline, f, fn, options):
             stats['characters'] += character_count(t)
             stats['tokens'] += token_count(t)
             stats['sentences'] += sentence_count(t)
-            print(t.rstrip('\n'))
+            t = t.rstrip('\n')
+            if options.no_split:
+                t = t.replace('\n', ' ')
+            print(t)
     return stats
 
 
