@@ -82,3 +82,5 @@ TFRECORD_DIR_128="$DATA_DIR/$LC/tfrecords/seq-128"
 TFRECORD_DIR_512="$DATA_DIR/$LC/tfrecords/seq-512"
 CREATE_TFRECORD="$BASE_DIR/bert/create_pretraining_data.py"
 source "$CONFIG_DIR/tfrecord.sh"
+
+MD5SUM_DIR="$DATA_DIR/$LC/md5sums"
