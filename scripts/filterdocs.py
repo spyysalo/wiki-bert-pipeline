@@ -5,6 +5,7 @@
 import sys
 import os
 import re
+import unicodedata
 
 from string import punctuation
 from collections import Counter
@@ -125,19 +126,19 @@ def filter_sentences(sentences, options):
     if (options.no_word_ratio is not None and
         no_word_ratio(sentences) > options.no_word_ratio):
         return 'no-word-ratio'
-    if (options.punct_ratio is not None and 
+    if (options.punct_ratio is not None and
         punctuation_ratio(sentences) > options.punct_ratio):
         return 'punct-ratio'
-    if (options.upper_ratio is not None and 
+    if (options.upper_ratio is not None and
         uppercase_ratio(sentences) > options.upper_ratio):
         return 'upper-ratio'
-    if (options.digit_ratio is not None and 
+    if (options.digit_ratio is not None and
         digit_ratio(sentences) > options.digit_ratio):
         return 'digit-ratio'
     if (options.foreign_ratio is not None and
         foreign_ratio(sentences) > options.foreign_ratio):
         return 'foreign-ratio'
-    if (options.min_words is not None and 
+    if (options.min_words is not None and
         num_words(sentences) < options.min_words):
         return 'min-words'
     if (options.langdetect is not None and
@@ -205,21 +206,50 @@ def process(fn, options):
     return stats
 
 
+def japanese_letters():
+    ranges = [
+        (0x3040, 0x309F),    # Hiragana
+        (0x30A0, 0x30FF),    # Katakana
+        (0x4E00, 0x9FAF),    # Common and uncommon kanji
+        (0x3400, 0x4DBF),    # Rare kanji
+    ]
+    letters = []
+    for start, end in ranges:
+        for i in range(start, end+1):
+            if unicodedata.category(chr(i)).startswith('L'):
+                letters.append(chr(i))
+    letters.extend('abcdefghijklmnopqrstuvwxyz')
+    return ''.join(letters)
+
+
 def compile_regular_expressions(options):
     global WORD_RE, FOREIGN_LETTER
 
-    if options.word_chars is not None:
+    if options.word_chars == 'ja':
+        # Special case for Japanese; UD Japanese tokenization is
+        # particularly aggressive about splitting up words, so
+        # only require a single character length for "word"
+        alpha = japanese_letters()
+        w_len = 1
+    elif options.word_chars:
         alpha = options.word_chars
+        w_len = 2
     else:
         print('Warning: --word-chars not given, using [a-z]', file=sys.stderr)
         alpha = 'abcdefghijklmnopqrstuvwxyz'
-    upper = alpha.upper()
+        w_len = 2
+    upper = ''.join([a.upper() for a in alpha if a.upper() not in alpha])
 
-    # Crude heuristic for "regular" word: at least two lowercase characters,
-    # optionally with an initial uppercase character.
-    WORD_RE = re.compile(r'\b['+upper+r']?['+alpha+r']{2,}\b')
+    # Heuristic for "regular" word: a minimum number of word characters,
+    # optionally with an initial uppercase character (if ones exist
+    # for the language).
+    w = str(w_len)
+    if upper:
+        WORD_RE = re.compile(r'\b['+upper+r']?['+alpha+r']{'+w+r',}\b')
+    else:
+        WORD_RE = re.compile(r'\b['+alpha+r']{'+w+r'}\b')
 
-    # Unicode letter that is not part of the alphabet 
+    # Unicode letter that is not part of the alphabet
     # (https://stackoverflow.com/a/6314634)
     FOREIGN_LETTER = re.compile(r'[^\W\d_'+alpha+upper+r']')
 
