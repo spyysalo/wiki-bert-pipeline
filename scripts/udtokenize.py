@@ -3,9 +3,11 @@
 import sys
 import re
 import json
+import gzip
 import bz2
 
 from collections import Counter
+from logging import warning
 
 try:
     from ufal.udpipe import Model, Pipeline
@@ -48,7 +50,7 @@ def character_count(text):
 
 
 def token_count(text):
-    return len(list(t for t in text.split()))    
+    return len(list(t for t in text.split()))
 
 
 def sentence_count(text):
@@ -59,6 +61,9 @@ def tokenize_stream(pipeline, f, fn, options):
     stats = Counter()
     for ln, l in enumerate(f, start=1):
         l = l.rstrip('\n')
+        if '\x00' in l:
+            warning('Removing null bytes from text in {}: {}'.format(fn, l))
+            l = l.replace('\x00', '')
         start_m = DOC_START_TAG_RE.match(l)
         end_m = DOC_END_TAG_RE.match(l)
         if l.isspace() or not l:
@@ -82,7 +87,10 @@ def tokenize_stream(pipeline, f, fn, options):
 
 
 def tokenize(pipeline, fn, options):
-    if fn.endswith('.bz2'):
+    if fn.endswith('.gz'):
+        with gzip.open(fn, 'rt', encoding=options.encoding) as f:
+            return tokenize_stream(pipeline, f, fn, options)
+    elif fn.endswith('.bz2'):
         with bz2.open(fn, 'rt', encoding=options.encoding) as f:
             return tokenize_stream(pipeline, f, fn, options)
     else:
