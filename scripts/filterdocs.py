@@ -27,6 +27,19 @@ WORD_RE = None    # see compile_regular_expressions()
 FOREIGN_LETTER = None    # see compile_regular_expressions()
 
 
+# Unicode character ranges for selected languages
+UNICODE_RANGES = {
+    'ja': [
+        (0x3040, 0x309F),    # Hiragana
+        (0x30A0, 0x30FF),    # Katakana
+        (0x4E00, 0x9FAF),    # Common and uncommon kanji
+        (0x3400, 0x4DBF),    # Rare kanji
+    ],
+    'ko': [
+        (0xAC00, 0xD7AF),    # Hangul Syllables
+    ],
+}
+
 def argparser():
     from argparse import ArgumentParser
     ap = ArgumentParser(description='Filter documents.')
@@ -206,38 +219,47 @@ def process(fn, options):
     return stats
 
 
-def japanese_letters():
-    ranges = [
-        (0x3040, 0x309F),    # Hiragana
-        (0x30A0, 0x30FF),    # Katakana
-        (0x4E00, 0x9FAF),    # Common and uncommon kanji
-        (0x3400, 0x4DBF),    # Rare kanji
-    ]
+def get_letters(unicode_ranges, include_a_to_z=True):
+    # Return list of characters in given unicode ranges with the
+    # letter (L) Unicode category.
     letters = []
-    for start, end in ranges:
+    for start, end in unicode_ranges:
         for i in range(start, end+1):
             if unicodedata.category(chr(i)).startswith('L'):
                 letters.append(chr(i))
-    letters.extend('abcdefghijklmnopqrstuvwxyz')
+    if include_a_to_z:
+        letters.extend('abcdefghijklmnopqrstuvwxyz')
     return ''.join(letters)
 
 
 def compile_regular_expressions(options):
     global WORD_RE, FOREIGN_LETTER
 
-    if options.word_chars == 'ja':
-        # Special case for Japanese; UD Japanese tokenization is
-        # particularly aggressive about splitting up words, so
-        # only require a single character length for "word"
-        alpha = japanese_letters()
+    if options.language not in ('ja',):
+        # Require two characters per word for most languages
+        w_len = 2
+    else:
+        # Special case for Japanese: UD tokenization is fairly
+        # aggressive about splitting up words, so only require a
+        # single character length for "word"
         w_len = 1
+
+    if options.language in ('ja', 'ko'):
+        if options.word_chars and options.word_chars != '-':
+            print('Warning: overriding --word-chars for {}'.format(
+                options.language))
+        alpha = get_letters(UNICODE_RANGES[options.language])
     elif options.word_chars:
         alpha = options.word_chars
-        w_len = 2
     else:
         print('Warning: --word-chars not given, using [a-z]', file=sys.stderr)
         alpha = 'abcdefghijklmnopqrstuvwxyz'
-        w_len = 2
+
+    if any(c for c in alpha if c.isspace()):
+        print('Warning: discarding space characters from --word-chars',
+              file=sys.stderr)
+        alpha = ''.join([c for c in alpha if not c.isspace()])
+
     upper = ''.join([a.upper() for a in alpha if a.upper() not in alpha])
 
     # Heuristic for "regular" word: a minimum number of word characters,
@@ -247,7 +269,7 @@ def compile_regular_expressions(options):
     if upper:
         WORD_RE = re.compile(r'\b['+upper+r']?['+alpha+r']{'+w+r',}\b')
     else:
-        WORD_RE = re.compile(r'\b['+alpha+r']{'+w+r'}\b')
+        WORD_RE = re.compile(r'\b['+alpha+r']{'+w+r',}\b')
 
     # Unicode letter that is not part of the alphabet
     # (https://stackoverflow.com/a/6314634)
@@ -256,6 +278,11 @@ def compile_regular_expressions(options):
 
 def main(argv):
     args = argparser().parse_args(argv[1:])
+    if args.langdetect in ('sr', 'eu', 'hy'):
+        print('NOTE: langdetect disabled for {} due to high error rate'.format(
+            args.langdetect), file=sys.stderr)
+        args.langdetect = None
+
     compile_regular_expressions(args)
     totals = Counter()
     for fn in args.file:
