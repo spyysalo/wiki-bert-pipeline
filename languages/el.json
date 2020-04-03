@@ -1,0 +1,5 @@
+{
+    "word-chars": "abcdefghijklmnopqrstuvwxyzΐάέήίαβγδεζηθικλμνξοπρςστυφχψωϊόύώ",
+    "wiki-dump": "https://ftp.acc.umu.se/mirror/wikimedia.org/dumps/elwiki/20200120/elwiki-20200120-pages-articles.xml.bz2",
+    "udpipe-model": "https://lindat.mff.cuni.cz/repository/xmlui/bitstream/handle/11234/1-3131/greek-gdt-ud-2.5-191206.udpipe"
+}
