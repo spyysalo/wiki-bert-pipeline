@@ -1,0 +1,5 @@
+{
+    "word-chars": "abcdefghijklmnoprstuvyzâçîöûüğış",
+    "wiki-dump": "https://ftp.acc.umu.se/mirror/wikimedia.org/dumps/trwiki/20200120/trwiki-20200120-pages-articles.xml.bz2",
+    "udpipe-model": "https://lindat.mff.cuni.cz/repository/xmlui/bitstream/handle/11234/1-3131/turkish-imst-ud-2.5-191206.udpipe"
+}
