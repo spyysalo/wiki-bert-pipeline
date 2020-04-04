@@ -1,0 +1,5 @@
+{
+    "word-chars": "abcdefghijklmnopqrstuvwxyzáéíóú",
+    "wiki-dump": "https://ftp.acc.umu.se/mirror/wikimedia.org/dumps/gawiki/20200120/gawiki-20200120-pages-articles.xml.bz2",
+    "udpipe-model": "https://lindat.mff.cuni.cz/repository/xmlui/bitstream/handle/11234/1-3131/irish-idt-ud-2.5-191206.udpipe"
+}
