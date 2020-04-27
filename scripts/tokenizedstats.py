@@ -4,6 +4,7 @@
 # one sentence per line, and space-separated tokens.
 
 import sys
+import math
 
 from collections import Counter
 
@@ -11,14 +12,37 @@ from collections import Counter
 def argparser():
     from argparse import ArgumentParser
     ap = ArgumentParser()
+    ap.add_argument('-H', '--human-readable', default=False,
+                    action='store_true')
+    ap.add_argument('-l', '--no-labels', default=False, action='store_true')
     ap.add_argument('file', nargs='+')
     return ap
 
 
-def print_stats(name, stats):
-    print('\t'.join([name] +
-                    ['{}:{}'.format(k,v) for k,v in sorted(stats.items())])
-    )
+# adapted from https://stackoverflow.com/a/3155023
+def human_readable(i):
+    names = ['', 'K', 'M', 'B', 'T']
+    n = math.floor(0 if i == 0 else math.log10(abs(i))/3)
+    idx = max(0, min(len(names)-1, int(n)))
+    d = i / 10**(3*idx)
+    if len(str(i)) < 2 or len('{:.0f}'.format(d)) > 1:
+        s = '{:.0f}'.format(d)
+    else:
+        s = '{:.1f}'.format(d)
+    return '{}{}'.format(s, names[idx])
+
+
+def print_stats(name, stats, options):
+    formatted = []
+    for (i, k), v in sorted(stats.items()):
+        if options.human_readable:
+            v = human_readable(v)
+        if options.no_labels:
+            formatted.append('{}'.format(v))
+        else:
+            formatted.append('{}:{}'.format(k, v))
+    print('\t'.join([name] + formatted))
+
 
 def tokenized_stats(fn, options):
     stats = Counter()
@@ -28,11 +52,13 @@ def tokenized_stats(fn, options):
             l = l.rstrip()
             if l.isspace() or not l:
                 if text_seen:
-                    stats['documents'] += 1
+                    stats[(0, 'documents')] += 1
                 text_seen = False
             else:
-                stats['sentences'] += 1
-                stats['tokens'] += len(l.split())
+                stats[(1, 'sentences')] += 1
+                tokens = l.split()
+                stats[(2, 'tokens')] += len(tokens)
+                stats[(3, 'chars')] += sum(len(t) for t in tokens)
                 text_seen = True
     return stats
 
@@ -42,9 +68,9 @@ def main(argv):
     totals = Counter()
     for fn in args.file:
         stats = tokenized_stats(fn, args)
-        print_stats(fn, stats)
+        print_stats(fn, stats, args)
         totals = totals + stats
-    print_stats('TOTAL', totals)
+    print_stats('TOTAL', totals, args)
     return 0
 
 
