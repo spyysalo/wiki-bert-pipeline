@@ -15,6 +15,7 @@ def argparser():
     ap.add_argument('-H', '--human-readable', default=False,
                     action='store_true')
     ap.add_argument('-l', '--no-labels', default=False, action='store_true')
+    ap.add_argument('-s', '--no-space', default=False, action='store_true')
     ap.add_argument('file', nargs='+')
     return ap
 
@@ -58,7 +59,10 @@ def tokenized_stats(fn, options):
                 stats[(1, 'sentences')] += 1
                 tokens = l.split()
                 stats[(2, 'tokens')] += len(tokens)
-                stats[(3, 'chars')] += sum(len(t) for t in tokens)
+                if options.no_space:
+                    stats[(3, 'chars')] += sum(len(t) for t in tokens)
+                else:
+                    stats[(3, 'chars')] += len(l)
                 text_seen = True
     return stats
 
