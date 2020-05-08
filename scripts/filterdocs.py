@@ -27,6 +27,12 @@ WORD_RE = None    # see compile_regular_expressions()
 FOREIGN_LETTER = None    # see compile_regular_expressions()
 
 
+# Languages not supported by langdetect or having a high langdetect
+# error rate
+NO_LANGDETECT_LANGUAGES = (
+    'sr', 'eu', 'hy', 'be', 'ga', 'gl', 'la', 'gd', 'ug', 'cu', 'mt'
+)
+
 # Unicode character ranges for selected languages
 UNICODE_RANGES = {
     'ja': [
@@ -235,7 +241,7 @@ def get_letters(unicode_ranges, include_a_to_z=True):
 def compile_regular_expressions(options):
     global WORD_RE, FOREIGN_LETTER
 
-    if options.language not in ('ja',):
+    if options.language not in ('ja', 'ko'):
         # Require two characters per word for most languages
         w_len = 2
     else:
@@ -262,14 +268,15 @@ def compile_regular_expressions(options):
 
     upper = ''.join([a.upper() for a in alpha if a.upper() not in alpha])
 
-    # Heuristic for "regular" word: a minimum number of word characters,
-    # optionally with an initial uppercase character (if ones exist
-    # for the language).
-    w = str(w_len)
+    # Heuristic for "regular" word: an optional initial uppercase
+    # character (if ones exist for the language) followed by a
+    # language-specific minimum number of word characters, and
+    # delimited by word boundaries.
+    word_re_str = r'\b'
     if upper:
-        WORD_RE = re.compile(r'\b['+upper+r']?['+alpha+r']{'+w+r',}\b')
-    else:
-        WORD_RE = re.compile(r'\b['+alpha+r']{'+w+r',}\b')
+        word_re_str += r'['+upper+r']?'
+    word_re_str += r'['+alpha+r']{'+str(w_len)+r',}\b'
+    WORD_RE = re.compile(word_re_str)
 
     # Unicode letter that is not part of the alphabet
     # (https://stackoverflow.com/a/6314634)
@@ -278,7 +285,7 @@ def compile_regular_expressions(options):
 
 def main(argv):
     args = argparser().parse_args(argv[1:])
-    if args.langdetect in ('sr', 'eu', 'hy'):
+    if args.langdetect in NO_LANGDETECT_LANGUAGES:
         print('NOTE: langdetect disabled for {} due to high error rate'.format(
             args.langdetect), file=sys.stderr)
         args.langdetect = None

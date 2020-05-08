@@ -14,5 +14,6 @@ DOC_FILTER_PARAMS="
 --min-words 30
 --foreign-ratio 0.02
 --word-chars $DOC_FILTER_WORD_CHARS
+--language $LC
 --langdetect $LC
 "

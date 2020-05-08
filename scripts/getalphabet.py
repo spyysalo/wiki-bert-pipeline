@@ -34,7 +34,7 @@ def main(argv):
         totals.update(counts)
     total = sum(totals.values())
     for k, v in sorted(totals.items(), key=lambda i: i[1], reverse=True):
-        print('{}\t{}\t{}\t({:.2%})'.format(
+        print('{}\t{}\t{}\t({:.4%})'.format(
             v/total > args.threshold, k, v, v/total))
     return 0
 
