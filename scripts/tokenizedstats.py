@@ -25,7 +25,7 @@ def human_readable(i):
     names = ['', 'K', 'M', 'B', 'T']
     n = math.floor(0 if i == 0 else math.log10(abs(i))/3)
     idx = max(0, min(len(names)-1, int(n)))
-    d = i / 10**(3*idx)
+    d = float(i) / 10**(3*idx)
     if len(str(i)) < 2 or len('{:.0f}'.format(d)) > 1:
         s = '{:.0f}'.format(d)
     else:
